@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-xutya3yty3cwl9%f70dd+^d60ky(+ut@vu&kl0mn^*^*f#z5#u
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -74,9 +74,12 @@ WSGI_APPLICATION = 'erandstodo.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "USER": "etusr",
+        "PASSWORD": "etpwd",
+        "HOST": "etdb",  # set in docker-compose.yml
+        "PORT": 5432,  # default postgres port
     }
 }
 

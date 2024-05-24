@@ -1,0 +1,21 @@
+services:
+  etweb:
+    build: .
+    ports:
+      - 10800:10800
+    command: python erandstodo/manage.py runserver  0.0.0.0:10800
+    volumes:
+      - .:/app
+    container_name: martor_demo
+    restart: unless-stopped
+  etdb:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=etusr
+      - POSTGRES_PASSWORD=etpwd
+      - POSTGRES_DB=etdata
+
+volumes:
+    postgres_data:
