@@ -6,7 +6,7 @@ services:
     command: python erandstodo/manage.py runserver  0.0.0.0:10800
     volumes:
       - .:/app
-    container_name: martor_demo
+    container_name: etweb
     restart: unless-stopped
   etdb:
     image: postgres:16
