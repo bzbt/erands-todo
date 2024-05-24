@@ -2,19 +2,28 @@ services:
   etweb:
     build: .
     ports:
-      - 10800:10800
-    command: python erandstodo/manage.py runserver  0.0.0.0:10800
+      - 9898:9898
     volumes:
       - .:/app
-    container_name: etweb
-    restart: unless-stopped
+    depends_on:
+      - etdb
+    environment:
+      - DEBUG=True
+      - DB_HOST=etdb
+      - DB_NAME=etdata
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - MIN_PASSWORD_LENGTH=3
+
   etdb:
     image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - 5455:5432
     environment:
-      - POSTGRES_USER=etusr
-      - POSTGRES_PASSWORD=etpwd
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=etdata
 
 volumes:

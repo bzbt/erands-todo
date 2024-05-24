@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from os import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-xutya3yty3cwl9%f70dd+^d60ky(+ut@vu&kl0mn^*^*f#z5#u"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -31,6 +32,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    "accounts",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -54,7 +56,9 @@ ROOT_URLCONF = "erandstodo.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            BASE_DIR / "templates",
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -76,9 +80,10 @@ WSGI_APPLICATION = "erandstodo.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "USER": "etusr",
-        "PASSWORD": "etpwd",
-        "HOST": "etdb",  # set in docker-compose.yml
+        "NAME": environ.get("DB_NAME"),  # set in docker-compose.yml
+        "USER": environ.get("DB_USER"),  # set in docker-compose.yml
+        "PASSWORD": environ.get("DB_PASSWORD"),  # set in docker-compose.yml
+        "HOST": environ.get("DB_HOST"),  # set in docker-compose.yml
         "PORT": 5432,  # default postgres port
     }
 }
@@ -93,6 +98,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": int(environ.get('MIN_PASSWORD_LENGTH', 32)),
+        },
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -124,3 +132,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Default redirect url log out
+LOGOUT_REDIRECT_URL = "index"

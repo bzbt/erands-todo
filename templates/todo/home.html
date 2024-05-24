@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <form action="{% url 'logout' %}" method="post">
+        Hi {{ user.username }}
+        {% csrf_token %}
+        <button type="submit">Log Out</button>
+    </form>
+
+
+    {% include "todo/_add_item.html" %}
+
+    {% if todos %}
+        <h2>Your Todos</h2>
+        {% include "todo/_list.html" with items=todos %}
+    {% else %}
+        <p>You have no todos.</p>
+    {% endif %}
+
+    {% include "todo/_add_item.html" %}
+{% endblock %}
