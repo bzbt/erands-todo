@@ -1,7 +1,5 @@
-{% extends "base.html" %}
-
+{% extends 'todos/base.html' %}
 {% block title %}Home{% endblock %}
-
 {% block content %}
     <form action="{% url 'logout' %}" method="post">
         Hi {{ user.username }}
@@ -10,14 +8,16 @@
     </form>
 
 
-    {% include "todo/_add_item.html" %}
 
-    {% if todos %}
-        <h2>Your Todos</h2>
-        {% include "todo/_list.html" with items=todos %}
+    <h2>Your Todos</h2>
+
+    {% include "todos/_add_btn.html" %}
+
+    {% if tasks %}
+        {% include "todos/_cards.html" with tasks=tasks %}
     {% else %}
         <p>You have no todos.</p>
     {% endif %}
 
-    {% include "todo/_add_item.html" %}
+    {% include "todos/_add_btn.html" %}
 {% endblock %}

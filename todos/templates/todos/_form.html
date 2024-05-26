@@ -1,0 +1,54 @@
+{% extends "todos/base.html" %}
+
+{% with task.public_id as public_id %}
+    {% block title %}
+        {{ public_id|yesno:"Edit task,Add task" }}
+    {% endblock %}
+{% endwith %}
+
+{% block content %}
+    <form action="{% url 'logout' %}" method="post">
+        Hi {{ user.username }}
+        {% csrf_token %}
+        <button type="submit">Log Out</button>
+    </form>
+
+    {% if task.public_id %}
+        <form action="{% url 'save_todo' task.public_id %}" method="post">
+    {% else %}
+        <form action="{% url 'save_todo' %}" method="post">
+    {% endif %}
+    <h2>
+        {% if task.public_id %}Edit{% else %}Add new{% endif %} task
+    </h2>
+    {% if errors %}
+        <ul>
+            {% for error in errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% csrf_token %}
+    <p>
+        <label>Title
+            <input type="text" name="title" placeholder="Task title" value="{{ task.title }}" />
+        </label>
+        <label>
+            <input type="checkbox" name="complete" {% if task.complete %}checked{% endif %} />
+            Complete
+        </label>
+    </p>
+    <p>
+        <label>Description
+            <textarea name="description"
+                      rows="10"
+                      cols="80"
+                      placeholder="Task description">{{ task.description }}</textarea>
+        </label>
+    </p>
+    <button type="submit">Submit</button>
+    {% if task.public_id %}
+    <button type="submit" name="delete">Delete</button>
+    {% endif %}
+</form>
+{% endblock %}
