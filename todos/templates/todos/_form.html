@@ -37,9 +37,20 @@
             <input type="checkbox" name="complete" {% if task.complete %}checked{% endif %} />
             Complete
         </label>
+        <label>
+            <select name="location_id">
+                <option value="">Select location</option>
+                {% for location in locations %}
+                    <option value="{{ location.id }}"
+                            {% if task.location and task.location.id == location.id %}selected{% endif %}>
+                        {{ location.city }}, {{ location.country }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
     </p>
     <p>
-        <label>Description
+        <label>Description<br>
             <textarea name="description"
                       rows="10"
                       cols="80"
@@ -48,7 +59,7 @@
     </p>
     <button type="submit">Submit</button>
     {% if task.public_id %}
-    <button type="submit" name="delete">Delete</button>
+        <button type="submit" name="delete">Delete</button>
     {% endif %}
 </form>
 {% endblock %}

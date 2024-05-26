@@ -7,13 +7,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('todos', '0002_alter_task_public_id'),
+        ("todos", "0002_alter_task_public_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='task',
-            name='public_id',
-            field=models.UUIDField(db_comment='Public identifier of the task', default=uuid.uuid4, editable=False),
+            model_name="task",
+            name="public_id",
+            field=models.UUIDField(
+                db_comment="Public identifier of the task",
+                default=uuid.uuid4,
+                editable=False,
+            ),
         ),
     ]

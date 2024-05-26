@@ -1,13 +1,13 @@
 import uuid
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseNotFound, HttpRequest
+from django.http import HttpResponseNotFound, HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView
 
 from todos import repository
-from todos.models import Task
+from todos.models import Task, Location
 from todos.factory import TaskFactory
 
 task_repository = repository.TaskRepository()
@@ -20,7 +20,6 @@ def index(request: HttpRequest):
 
     @param request: The request object
     """
-
     return render(
         request,
         "todos/_home.html",
@@ -28,35 +27,45 @@ def index(request: HttpRequest):
     )
 
 
-class TaskForm(TemplateView):
+@login_required(login_url="account/login/")
+def add(request: HttpRequest) -> HttpResponse:
     """
     Renders the task form when adding a new task
-    """
 
-    login_required(login_url="account/login/")
-    template_name = "todos/_form.html"
+    @param request: The request object
+
+    @return: The HTTP response
+    """
+    locations = Location.objects.all()
+    return render(request, "todos/_form.html", {"locations": locations})
 
 
 # Edit a task
 @login_required(login_url="account/login/")
-def edit(request: HttpRequest, public_id: str):
+def edit(request: HttpRequest, public_id: str) -> HttpResponseNotFound | HttpResponse:
     """
     Renders the task form when editing a task
 
     @param request: The request object
     @param public_id: The public id of the task
-    """
 
+    @return: The HTTP response
+    """
     try:
         task = task_repository.get_for_user_by_public_id(public_id, request.user)
-        return render(request, "todos/_form.html", {"task": task})
+        locations = Location.objects.all()
+        return render(
+            request, "todos/_form.html", {"task": task, "locations": locations}
+        )
     except Task.DoesNotExist:
         return HttpResponseNotFound("Task not found")
 
 
 @login_required(login_url="account/login/")
 @require_http_methods(["POST"])
-def save(request: HttpRequest, public_id: str = None):
+def save(
+    request: HttpRequest, public_id: str = None
+) -> HttpResponseNotFound | HttpResponse:
     """
     Creates or updates a task and redirects to the home page
 
@@ -65,17 +74,23 @@ def save(request: HttpRequest, public_id: str = None):
     """
 
     errors = []
-    task = public_id and task_repository.get_by_public_id(public_id) or Task()
-    if public_id and task.user != request.user:
+    belongs_to_user = (
+        True
+        if public_id is None
+        else task_repository.belongs_to_user(public_id, request.user)
+    )
+
+    print("pubid " + str(belongs_to_user))
+    if not belongs_to_user:
         return HttpResponseNotFound("Task not found")
 
-    task = TaskFactory().from_post(request)
-    if "delete" in request.POST:
-        task.deleted = True
+    task = TaskFactory().from_post(request, public_id)
+
+    if task.deleted:
         task.save()
         return redirect("index")
 
-    if request.POST["title"] == "":
+    if task.title == "":
         errors.append("Title is required")
 
     if errors:

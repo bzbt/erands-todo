@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('todos', '0003_alter_task_public_id'),
+        ("todos", "0003_alter_task_public_id"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='task',
-            name='deleted',
-            field=models.BooleanField(db_comment='Whether the task is deleted', default=False),
+            model_name="task",
+            name="deleted",
+            field=models.BooleanField(
+                db_comment="Whether the task is deleted", default=False
+            ),
         ),
     ]

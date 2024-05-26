@@ -33,7 +33,8 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "accounts",
-    'todos',
+    "todos",
+    "weather",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -100,7 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         "OPTIONS": {
-            "min_length": int(environ.get('MIN_PASSWORD_LENGTH', 32)),
+            "min_length": int(environ.get("MIN_PASSWORD_LENGTH", 32)),
         },
     },
     {
