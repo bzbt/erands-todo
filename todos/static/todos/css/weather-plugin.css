@@ -1,0 +1,11 @@
+.weather-plugin {
+    display:     flex;
+    align-items: center;
+}
+
+.weather-plugin .condition {
+    width:            20px;
+    height:           20px;
+    margin:           0 10px;
+    background-color: aliceblue;
+}

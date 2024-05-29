@@ -1,7 +1,12 @@
 <div class="cards">
     {% for task in tasks %}
         <div class="card">
-            <a href="{% url 'edit_todo' task.public_id %}">{{ task.title }}</a>
+            <a href="{% url 'update_task' task.public_id %}"
+                    {%  if task.weather.condition_map %}
+                        title="{{ task.weather.condition_map.name }}"
+                        style="background-color: {{ task.weather.condition_map.color }}"
+                    {% endif %}
+            >{{ task.title }}</a>
         </div>
     {% endfor %}
 </div>

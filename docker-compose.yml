@@ -2,18 +2,13 @@ services:
   etweb:
     build: .
     ports:
-      - 9898:9898
+      - 8000:8000
     volumes:
       - .:/app
     depends_on:
       - etdb
-    environment:
-      - DEBUG=True
-      - DB_HOST=etdb
-      - DB_NAME=etdata
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - MIN_PASSWORD_LENGTH=3
+    env_file:
+      - .env
 
   etdb:
     image: postgres:16

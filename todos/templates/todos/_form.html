@@ -1,11 +1,7 @@
 {% extends "todos/base.html" %}
-
-{% with task.public_id as public_id %}
-    {% block title %}
-        {{ public_id|yesno:"Edit task,Add task" }}
-    {% endblock %}
-{% endwith %}
-
+{% block title %}
+    {{ form.instance.public_id|yesno:"Edit task, Add task" }}
+{% endblock %}
 {% block content %}
     <form action="{% url 'logout' %}" method="post">
         Hi {{ user.username }}
@@ -13,53 +9,42 @@
         <button type="submit">Log Out</button>
     </form>
 
-    {% if task.public_id %}
-        <form action="{% url 'save_todo' task.public_id %}" method="post">
-    {% else %}
-        <form action="{% url 'save_todo' %}" method="post">
-    {% endif %}
     <h2>
-        {% if task.public_id %}Edit{% else %}Add new{% endif %} task
+        {% if form.instance.pk %}Update{% else %}Create{% endif %} Task
     </h2>
-    {% if errors %}
-        <ul>
-            {% for error in errors %}
-                <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    {% csrf_token %}
-    <p>
-        <label>Title
-            <input type="text" name="title" placeholder="Task title" value="{{ task.title }}" />
-        </label>
-        <label>
-            <input type="checkbox" name="complete" {% if task.complete %}checked{% endif %} />
-            Complete
-        </label>
-        <label>
-            <select name="location_id">
-                <option value="">Select location</option>
-                {% for location in locations %}
-                    <option value="{{ location.id }}"
-                            {% if task.location and task.location.id == location.id %}selected{% endif %}>
-                        {{ location.city }}, {{ location.country }}
-                    </option>
-                {% endfor %}
-            </select>
-        </label>
-    </p>
-    <p>
-        <label>Description<br>
-            <textarea name="description"
-                      rows="10"
-                      cols="80"
-                      placeholder="Task description">{{ task.description }}</textarea>
-        </label>
-    </p>
-    <button type="submit">Submit</button>
-    {% if task.public_id %}
-        <button type="submit" name="delete">Delete</button>
-    {% endif %}
-</form>
+    <div data-weather-wrapper class="flex center-column gray-50"
+         style="background-color: {{ weather.condition_map.color }}">
+        <div>
+            <strong>Weather:</strong>
+            <span data-weather class="weather">
+                {% if weather %}{{ weather }},{% endif %}
+                {% if weather.condition_map %}{{ weather.condition_map.name }}{% endif %}
+                {% if location %}in {{ location }} {% endif %}
+            </span>
+            {% if not form.instance.complete %}
+                <input data-refresh type="button" value="Refresh" />
+            {% endif %}
+            {% if weather_errors %}
+                <h2>Weather Errors:</h2>
+                <ul>
+                    {% for error in weather_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <form method="post" class="two-column">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {% if not form.instance.complete %}
+                <button type="submit">Save</button>
+            {% endif %}
+            {% if form.instance.pk %}
+                <button type="submit" name="complete">
+                    {% if form.instance.complete %}Mark as incomplete{% else %}Mark as complete{% endif %}
+                </button>
+                <button type="submit" name="delete">Delete</button>
+            {% endif %}
+        </form>
+    </div>
 {% endblock %}

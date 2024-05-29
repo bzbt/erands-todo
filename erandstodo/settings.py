@@ -21,20 +21,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-xutya3yty3cwl9%f70dd+^d60ky(+ut@vu&kl0mn^*^*f#z5#u"
+SECRET_KEY = environ.get("SECRET_KEY", "django-insecure-xutya3yty3cwl9%f70dd+^d60ky(+ut@vu&kl0mn^*^*f#z5#u")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["0.0.0.0"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    "accounts",
-    "todos",
-    "weather",
+    "accounts.apps.AccountsConfig",
+    "todos.apps.TodosConfig",
+    "weather.apps.WeatherConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -135,5 +135,9 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Default redirect url log out
-LOGOUT_REDIRECT_URL = "index"
+# Default redirect url after logout and signup
+LOGOUT_REDIRECT_URL = "task_list"
+SIGNUP_REDIRECT_URL = "task_list"
+
+# OpenWeather API key
+OPENWEATHER_API_KEY = environ.get("OPENWEATHER_API_KEY")

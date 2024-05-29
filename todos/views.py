@@ -1,20 +1,18 @@
-import uuid
+import json
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseNotFound, HttpRequest, HttpResponse
-from django.shortcuts import render, redirect
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
-from django.views.generic import TemplateView
 
-from todos import repository
+from todos.decorators.tasks import task_create_or_update
+from todos.forms import TaskForm, WeatherForm
 from todos.models import Task, Location
-from todos.factory import TaskFactory
-
-task_repository = repository.TaskRepository()
+from todos.utils import refresh_weather
 
 
 @login_required(login_url="account/login/")
-def index(request: HttpRequest):
+def index(request: HttpRequest) -> HttpResponse:
     """
     Renders the home page
 
@@ -23,79 +21,87 @@ def index(request: HttpRequest):
     return render(
         request,
         "todos/_home.html",
-        {"tasks": task_repository.get_all_for_user(request.user)},
+        {"tasks": Task.objects.all().filter(user=request.user, deleted=False)},
     )
 
 
 @login_required(login_url="account/login/")
-def add(request: HttpRequest) -> HttpResponse:
+@task_create_or_update
+def manage_task(request: HttpRequest, **kwargs) -> HttpResponse:
     """
-    Renders the task form when adding a new task
+    Creates or updates a task and redirects to the home page
 
-    @param request: The request object
+    Args:
+        request  (HttpRequest): The HTTP request object
+        **kwargs (Any):           Additional keyword arguments
 
-    @return: The HTTP response
+    Returns:
+        HttpResponse: The HTTP response
     """
-    locations = Location.objects.all()
-    return render(request, "todos/_form.html", {"locations": locations})
+    task: Task = kwargs.get("task")
 
+    if request.method == 'POST':
+        form = TaskForm(request.POST, instance=task)
+        if form.data.get('delete') is not None:
+            task.deleted = True
+            task.save(update_fields=['deleted'])
+            return redirect('task_list')
+        if form.data.get('complete') is not None:
+            task.complete = not task.complete
+            task.save(update_fields=['complete'])
+            return redirect('update_task', task.public_id)
 
-# Edit a task
-@login_required(login_url="account/login/")
-def edit(request: HttpRequest, public_id: str) -> HttpResponseNotFound | HttpResponse:
-    """
-    Renders the task form when editing a task
+        weather_data = json.loads(request.POST.get('weather'))
+        weather_form = WeatherForm(weather_data)
+        if form.is_valid() and weather_form.is_valid():
+            task = form.save(commit=False)
+            task.weather = weather_form.save()
+            task.user = request.user
+            task.save()
 
-    @param request: The request object
-    @param public_id: The public id of the task
+            return redirect('task_list')
+        else:
+            return render(
+                request, 'todos/_form.html',
+                {'form': TaskForm(instance=task), 'weather_errors': weather_form.errors}
+            )
+    else:
+        form = TaskForm(instance=task, disable_all=task.complete)
 
-    @return: The HTTP response
-    """
-    try:
-        task = task_repository.get_for_user_by_public_id(public_id, request.user)
-        locations = Location.objects.all()
-        return render(
-            request, "todos/_form.html", {"task": task, "locations": locations}
-        )
-    except Task.DoesNotExist:
-        return HttpResponseNotFound("Task not found")
+    return render(
+        request,
+        'todos/_form.html',
+        {
+            'form': form,
+            "weather": task.weather,
+            "location": task.location,
+        }
+    )
 
 
 @login_required(login_url="account/login/")
 @require_http_methods(["POST"])
-def save(
-    request: HttpRequest, public_id: str = None
-) -> HttpResponseNotFound | HttpResponse:
+def get_weather(request: HttpRequest) -> JsonResponse:
     """
-    Creates or updates a task and redirects to the home page
+    Returns assigned weather data for a task or location.
 
-    @param request: The request object
-    @param public_id: The public id of the task
+    Args:
+        request (HttpRequest): The request object
+
+    Returns:
+        JsonResponse: The HTTP response
     """
+    data = json.loads(request.body)
+    location_id = data.get("location_id")
+    task_id = data.get("task_id")
+    location = get_object_or_404(Location, id=location_id)
+    task = get_object_or_404(Task, public_id=task_id, user=request.user) if task_id else None
 
-    errors = []
-    belongs_to_user = (
-        True
-        if public_id is None
-        else task_repository.belongs_to_user(public_id, request.user)
-    )
+    if task and task.complete:
+        return JsonResponse({"error": "Task is complete"}, status=400)
 
-    print("pubid " + str(belongs_to_user))
-    if not belongs_to_user:
-        return HttpResponseNotFound("Task not found")
-
-    task = TaskFactory().from_post(request, public_id)
-
-    if task.deleted:
-        task.save()
-        return redirect("index")
-
-    if task.title == "":
-        errors.append("Title is required")
-
-    if errors:
-        task.public_id = None
-        return render(request, "todos/_form.html", {"errors": errors, "task": task})
-
-    task.save()
-    return redirect("index")
+    try:
+        weather = refresh_weather(location, task)
+        return JsonResponse(weather.as_dictionary())
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=404)

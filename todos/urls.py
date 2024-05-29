@@ -1,11 +1,9 @@
 from django.urls import path
 from . import views
 
-
 urlpatterns = [
-    path("", views.index, name="index"),
-    path("add/", views.add, name="add_todo"),
-    path("edit/<str:public_id>", views.edit, name="edit_todo"),
-    path("save/", views.save, name="save_todo"),
-    path("save/<str:public_id>", views.save, name="save_todo"),
+    path("", views.index, name="task_list"),
+    path("task/", views.manage_task, name="create_task"),
+    path("task/<str:public_id>", views.manage_task, name="update_task"),
+    path("task/weather/", views.get_weather, name="location_weather"),
 ]

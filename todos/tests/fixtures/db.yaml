@@ -1,0 +1,105 @@
+- model: auth.user
+  pk: 2
+  fields:
+    password: ''
+    last_login: null
+    is_superuser: false
+    username: testuser
+    first_name: ''
+    last_name: ''
+    email: ''
+    is_staff: false
+    is_active: true
+    date_joined: 2024-05-28 19:17:27.278752+00:00
+    groups: []
+    user_permissions: []
+- model: todos.task
+  pk: 1
+  fields:
+    public_id: 686f0fa3-f3b4-438c-a729-e9cc05148586
+    title: test
+    description: asd
+    location: 3
+    weather: 15
+    user: 2
+    complete: false
+    deleted: false
+    created: 2024-05-28 17:46:27.104028+00:00
+    updated: 2024-05-29 11:09:33.402997+00:00
+- model: todos.task
+  pk: 2
+  fields:
+    public_id: ba3e5f0f-6221-49ea-9ee4-f97f2542597e
+    title: pl
+    description: ''
+    location: 2
+    weather: 16
+    user: 2
+    complete: false
+    deleted: false
+    created: 2024-05-28 18:09:35.719269+00:00
+    updated: 2024-05-29 11:09:38.387420+00:00
+- model: todos.task
+  pk: 3
+  fields:
+    public_id: e17f400c-070e-4829-87c9-c73f5f80710f
+    title: aa
+    description: ''
+    location: 5
+    weather: 18
+    user: 2
+    complete: false
+    deleted: false
+    created: 2024-05-29 11:09:44.642127+00:00
+    updated: 2024-05-29 11:09:52.248432+00:00
+- model: todos.location
+  pk: 2
+  fields:
+    city: London
+    country: UK
+    latitude: 51.5073219
+    longitude: -0.1276474
+- model: todos.location
+  pk: 3
+  fields:
+    city: Paris
+    country: France
+    latitude: 48.8588897
+    longitude: 2.3200410217200766
+- model: todos.location
+  pk: 5
+  fields:
+    city: New York
+    country: USA
+    latitude: 40.7127281
+    longitude: -74.0060152
+- model: todos.weather
+  pk: 15
+  fields:
+    temperature: 288.84
+    humidity: 93
+    condition: 501
+    latitude: 48.8588897
+    longitude: 2.3200410217200766
+    created: 2024-05-29 11:09:33.395904+00:00
+    updated: 2024-05-29 11:09:33.395917+00:00
+- model: todos.weather
+  pk: 16
+  fields:
+    temperature: 291.57
+    humidity: 62
+    condition: 804
+    latitude: 51.5073219
+    longitude: -0.1276474
+    created: 2024-05-29 11:09:38.380440+00:00
+    updated: 2024-05-29 11:09:38.380449+00:00
+- model: todos.weather
+  pk: 18
+  fields:
+    temperature: 290.04
+    humidity: 73
+    condition: 800
+    latitude: 40.7127281
+    longitude: -74.0060152
+    created: 2024-05-29 11:09:52.241440+00:00
+    updated: 2024-05-29 11:09:52.241449+00:00
