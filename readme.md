@@ -53,15 +53,15 @@ A simple Todo application built with Django 5 and Python 3.12.
     docker compose exec etweb python manage.py migrate
     ```
 
-4**Create a superuser:**
+4. **Create a superuser:**
 
     ```sh
     docker compose exec etweb python manage.py createsuperuser
     ```
 
-    Follow the prompts to create a superuser account. You can use this account to log in to
-    the [admin interface](http://0.0.0.0:8000/admin).
+   Follow the prompts to create a superuser account. You can use this account to log in to
+   the [admin interface](http://0.0.0.0:8000/admin).
 
-5**Access the application:**
+5. **Access the application:**
 
-    Open your web browser and go to `http://0.0.0.0:8000`.
+   Open your web browser and go to `http://0.0.0.0:8000`.
